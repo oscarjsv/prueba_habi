@@ -21,6 +21,30 @@ Este proyecto consiste en desarrollar un servidor HTTP que permita realizar cons
 
 5. **Manejo de Errores**: Implementaremos el manejo de errores para manejar situaciones como la falta de conexión a la base de datos, solicitudes incorrectas o errores internos del servidor. Utilizaremos códigos de estado HTTP apropiados y mensajes de error descriptivos para informar al cliente sobre el estado de la solicitud.
 
+## Filtros de la API
+
+Aquí se describen los filtros que se pueden utilizar al hacer consultas a la API. Se espera que estos filtros sean enviados desde el front-end para filtrar los resultados de la consulta.
+
+```json
+{
+  "filtros": {
+    "año_construccion": {
+      "tipo": "rango",
+      "descripcion": "Filtrar por año de construcción (rango de años)"
+    },
+    "ciudad": {
+      "tipo": "texto",
+      "descripcion": "Filtrar por ciudad"
+    },
+    "estado_propiedad": {
+      "tipo": "opciones",
+      "descripcion": "Filtrar por estado de la propiedad",
+      "opciones": ["pre_venta", "en_venta", "vendido"]
+    }
+  }
+}
+
+
 ## Ejecución del Proyecto
 
 1. Clona este repositorio en tu máquina local.
