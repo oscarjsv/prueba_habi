@@ -43,7 +43,7 @@ Aquí se describen los filtros que se pueden utilizar al hacer consultas a la AP
     }
   }
 }
-
+```
 
 ## Ejecución del Proyecto
 
@@ -52,9 +52,6 @@ Aquí se describen los filtros que se pueden utilizar al hacer consultas a la AP
 3. Ejecuta el servidor utilizando el comando `python server.py`.
 4. Realiza solicitudes GET al servidor especificando los parámetros deseados en la URL.
 
-## Contribuciones
-
-Las contribuciones son bienvenidas. Si encuentras algún problema o tienes alguna mejora, por favor crea un issue o envía un pull request.
 
 ## Licencia
 
