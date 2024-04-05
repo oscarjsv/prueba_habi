@@ -44,6 +44,9 @@ Aquí se describen los filtros que se pueden utilizar al hacer consultas a la AP
   }
 }
 ```
+## Dudas
+
+No se si dokerizar la aplicacion o no estoy pensandolo
 
 ## Ejecución del Proyecto
 

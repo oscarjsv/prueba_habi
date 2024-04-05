@@ -26,6 +26,7 @@ class TestRequestHandler(TestCase):
         cls.server.shutdown()
         cls.thread.join()
 
+    # Verifico si devuelve una cadena de texto cuando no se encuentran coinicidencias en la busqueda
     def test_get_request_not_matches(self):
         response = urllib.request.urlopen(
             f'http://localhost:{self.port}/get_and_search/?year=2020&city=Medellin&state=en_venta')
@@ -33,6 +34,7 @@ class TestRequestHandler(TestCase):
         response_data = json.loads(response.read().decode())
         self.assertIsInstance(response_data, str)
 
+    # Verifico si una parte del string que se devuelve cuando un estado es invalido coincide con la respuesta de mi api
     def test_get_request_with_invalid_state_parameter(self):
         response = urllib.request.urlopen(
             f'http://localhost:{self.port}/get_and_search/?year=2020&city=Medellin&state=invalido')
@@ -40,6 +42,7 @@ class TestRequestHandler(TestCase):
         response_data = json.loads(response.read().decode())
         self.assertIn('Estado no permitido', response_data['message'])
 
+    # verifico si el tipo que se devuelve de una peticion es una lista cuando no se pasa ningun parametro
     def test_get_request_without_parameters(self):
         response = urllib.request.urlopen(
             f'http://localhost:{self.port}/get_and_search/')
@@ -47,6 +50,7 @@ class TestRequestHandler(TestCase):
         response_data = json.loads(response.read().decode())
         self.assertIsInstance(response_data, list)
 
+    # verifico si el tipo que se devuelve de una peticion es una lista cuando no se pasan varios parametros
     def test_get_request_with_one_response(self):
         response = urllib.request.urlopen(
             f'http://localhost:{self.port}/get_and_search/?city=bucaramanga&state=en_venta&year=2021')
@@ -54,6 +58,7 @@ class TestRequestHandler(TestCase):
         response_data = json.loads(response.read().decode())
         self.assertIsInstance(response_data, list)
 
+    # Verifico que el endpoint pasado sea igual al que se tiene como predeterminado
     def test_parsed_path_equal_to_endpoint(self):
         parsed_path = urllib.parse.urlparse("/get_and_search/")
         result = validate_path(self, parsed_path)

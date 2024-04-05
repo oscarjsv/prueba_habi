@@ -1,7 +1,6 @@
-# consulta.py
-
 import json
 from http.server import BaseHTTPRequestHandler
+import os
 import urllib.parse
 
 from database import conectar_base_datos
@@ -10,6 +9,7 @@ from database import conectar_base_datos
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
+
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
@@ -33,8 +33,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             if not validate_path(self, parsed_path):
                 return  # Verificar si el path es válido
 
-
-            # Consulta a la base de datos 
+            # Consulta a la base de datos
             consulta = """
                             SELECT p.address, p.city, s.name AS current_status, p.price, p.description
                             FROM property p
@@ -75,7 +74,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     cursor.close()
                     conexion.close()
                     return
-            
+
             if condiciones:
                 consulta += "WHERE " + " AND ".join(condiciones)
 
