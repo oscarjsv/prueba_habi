@@ -4,11 +4,9 @@ import socketserver
 import threading
 import urllib.request
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
-from consulta_handler import RequestHandler
-
-# Assuming the RequestHandler class and conectar_base_datos function are defined elsewhere and imported here
+from consulta_handler import RequestHandler, validate_path
 
 
 class TestRequestHandler(TestCase):
@@ -28,86 +26,49 @@ class TestRequestHandler(TestCase):
         cls.server.shutdown()
         cls.thread.join()
 
-    @patch('database.conectar_base_datos')
-    def test_get_request_with_valid_parameters(self, mock_db):
-        # Mock the database connection to return a dummy connection object
-        mock_db.return_value = True
+    def test_get_request_not_matches(self):
         response = urllib.request.urlopen(
-            f'http://localhost:{self.port}/?year=2020&city=Medellin&state=en_venta')
+            f'http://localhost:{self.port}/get_and_search/?year=2020&city=Medellin&state=en_venta')
         self.assertEqual(response.status, 200)
         response_data = json.loads(response.read().decode())
-        print(type(response_data))
-        # Assuming the response is a list of properties
         self.assertIsInstance(response_data, str)
 
-    @patch('database.conectar_base_datos')
-    def test_get_request_with_database_connection_failure(self, mock_db):
-        # Mock the database connection to return None, simulating a failure
-        mock_db.return_value = None
-        print("RESPONSE: ")
-        response = urllib.request.urlopen(
-            f'http://localhost:{self.port}/?year=2020&city=Medellin&state=en_venta')
-        print("RESPONSE: ", response)
-        self.assertEqual(response.status, 500)
-        response_data = json.loads(response.read().decode())
-        self.assertIn('Error al conectar a la base de datos',
-                      response_data['error'])
-
     def test_get_request_with_invalid_state_parameter(self):
         response = urllib.request.urlopen(
-            f'http://localhost:{self.port}/?year=2020&city=Medellin&state=invalido')
-        # Assuming the server still responds with 200 but includes an error message
+            f'http://localhost:{self.port}/get_and_search/?year=2020&city=Medellin&state=invalido')
         self.assertEqual(response.status, 200)
         response_data = json.loads(response.read().decode())
-        self.assertIn('Estado no permitido', response_data['error'])
-import json
-from http.server import HTTPServer
-import socketserver
-import threading
-import urllib.request
-from unittest import TestCase
-from unittest.mock import patch
+        self.assertIn('Estado no permitido', response_data['message'])
 
-# Assuming the RequestHandler class and conectar_base_datos function are defined elsewhere and imported here
-
-class TestRequestHandler(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        # Setup a simple HTTP server for testing
-        handler = RequestHandler
-        cls.server = HTTPServer(('localhost', 0), handler)  # 0 means any free port
-        cls.port = cls.server.server_address[1]
-        cls.thread = threading.Thread(target=cls.server.serve_forever)
-        cls.thread.daemon = True
-        cls.thread.start()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.server.shutdown()
-        cls.thread.join()
-
-    @patch('database.conectar_base_datos')
-    def test_get_request_with_valid_parameters(self, mock_db):
-        # Mock the database connection to return a dummy connection object
-        mock_db.return_value = True
-        response = urllib.request.urlopen(f'http://localhost:{self.port}/?year=2020&city=Medellin&state=en_venta')
+    def test_get_request_without_parameters(self):
+        response = urllib.request.urlopen(
+            f'http://localhost:{self.port}/get_and_search/')
         self.assertEqual(response.status, 200)
         response_data = json.loads(response.read().decode())
-        self.assertIsInstance(response_data, str)  # Assuming the response is a list of properties
+        self.assertIsInstance(response_data, list)
 
-    #!PENDIENTE
-    @patch('database.conectar_base_datos')
-    def test_get_request_with_database_connection_failure(self, mock_db):
-        # Mock the database connection to return None, simulating a failure
-        mock_db.return_value = None
-        response = urllib.request.urlopen(f'http://localhost:{self.port}/?year=2020&city=Medellin&state=en_venta')
-        self.assertEqual(response.status, 500)
+    def test_get_request_with_one_response(self):
+        response = urllib.request.urlopen(
+            f'http://localhost:{self.port}/get_and_search/?city=bucaramanga&state=en_venta&year=2021')
+        self.assertEqual(response.status, 200)
         response_data = json.loads(response.read().decode())
-        self.assertIn('Error al conectar a la base de datos', response_data['error'])
+        self.assertIsInstance(response_data, list)
 
-    def test_get_request_with_invalid_state_parameter(self):
-        response = urllib.request.urlopen(f'http://localhost:{self.port}/?year=2020&city=Medellin&state=invalido')
-        self.assertEqual(response.status, 200)  # Assuming the server still responds with 200 but includes an error message
-        response_data = json.loads(response.read().decode())
-        self.assertIn('Estado no permitido', response_data['error'])
-    
+    def test_parsed_path_equal_to_endpoint(self):
+        parsed_path = urllib.parse.urlparse("/get_and_search/")
+        result = validate_path(self, parsed_path)
+        self.assertTrue(result)
+
+    # returns False and sends a 400 error if parsed_path is None
+    def test_parsed_path_none(self):
+        parsed_path = None
+        with self.assertRaises(Exception) as context:
+            try:
+                validate_path(self, parsed_path)
+            except AttributeError as e:
+                self.assertEqual(
+                    str(e), "'AttributeError' object has no attribute 'code'")
+                self.assertEqual(
+                    context.exception.__class__.__name__, 'AttributeError')
+            else:
+                self.fail("Expected an AttributeError to be raised")

@@ -33,8 +33,10 @@ class RequestHandler(BaseHTTPRequestHandler):
             if not validate_path(self, parsed_path):
                 return  # Verificar si el path es válido
 
+
+            # Consulta a la base de datos 
             consulta = """
-                            SELECT p.id, p.address, p.city, s.name AS current_status, p.price, p.description
+                            SELECT p.address, p.city, s.name AS current_status, p.price, p.description
                             FROM property p
                             JOIN (
                                 SELECT sh.property_id, sh.status_id, sh.update_date
@@ -73,7 +75,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     cursor.close()
                     conexion.close()
                     return
-
+            
             if condiciones:
                 consulta += "WHERE " + " AND ".join(condiciones)
 
@@ -106,10 +108,8 @@ def handle_database_connection_error(self):
 
 
 def validate_path(self, parsed_path):
-    print(parsed_path.path)
     endpoint = "/get_and_search/"
     if parsed_path.path == endpoint:
-        print(1)
         return True
     else:
         self.send_error(400, str('Error al ingresar el endpoint'))
