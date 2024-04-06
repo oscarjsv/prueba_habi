@@ -9,107 +9,117 @@ from database import conectar_base_datos
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
-
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
 
-            # Establecer conexión a la base de datos
-            try:
-                conexion = conectar_base_datos()
-                if not conexion:
-                    raise Exception("Error al conectar a la base de datos.")
-                # Proceder con el manejo de la solicitud asumiendo que la conexión a la base de datos es exitosa
-            except Exception as e:
+            conexion = self.establecer_conexion_base_datos()
+            if not conexion:
                 self.handle_database_connection_error()
                 return
 
-            cursor = conexion.cursor()
+            query_params = self.obtener_parametros_url()
 
-            # Obtener parámetros de la URL
-            parsed_path = urllib.parse.urlparse(self.path)
-            query_params = urllib.parse.parse_qs(parsed_path.query)
+            if not self.validar_path():
+                return
 
-            if not validate_path(self, parsed_path):
-                return  # Verificar si el path es válido
+            consulta = self.construir_consulta(query_params)
+            resultado = self.ejecutar_consulta(conexion, consulta)
 
-            # Consulta a la base de datos
-            consulta = """
-                            SELECT p.address, p.city, s.name AS current_status, p.price, p.description
-                            FROM property p
-                            JOIN (
-                                SELECT sh.property_id, sh.status_id, sh.update_date
-                                FROM status_history sh
-                                JOIN (
-                                    SELECT property_id, MAX(update_date) AS max_update_date
-                                    FROM status_history
-                                    GROUP BY property_id
-                                ) max_sh ON sh.property_id = max_sh.property_id AND sh.update_date = max_sh.max_update_date
-                            ) latest_sh ON p.id = latest_sh.property_id
-                            JOIN status s ON latest_sh.status_id = s.id
-                            """
-            estados_permitidos = ("pre_venta", "en_venta", "vendido")
-
-            condiciones = []
-
-            # Filtrar por año de construcción si está presente en los parámetros
-            if 'year' in query_params:
-                condiciones.append(
-                    "p.year = {}".format(query_params['year'][0]))
-
-            # Filtrar por ciudad si está presente en los parámetros
-            if 'city' in query_params:
-                condiciones.append(
-                    "p.city = '{}'".format(query_params['city'][0]))
-
-            if 'state' in query_params:
-                estado = query_params['state'][0]
-                if estado in estados_permitidos:
-                    condiciones.append(
-                        "s.name = '{}'".format(estado))
-                else:
-                    # Si el estado no está permitido, enviar un mensaje de error en JSON
-                    self.wfile.write(json.dumps(
-                        {"message": "Estado no permitido para la consulta pruebe con los estados disponible"}).encode())
-                    cursor.close()
-                    conexion.close()
-                    return
-
-            if condiciones:
-                consulta += "WHERE " + " AND ".join(condiciones)
-
-            cursor.execute(consulta)
-            resultado = cursor.fetchall()
             if resultado:
-                # Convertir resultado a formato JSON y enviar como respuesta
-                resultado = json.dumps(resultado).encode()
-                self.wfile.write(resultado)
+                self.enviar_respuesta(resultado)
             else:
-                self.send_response(200, 'no se encuentran coincidencias')
-                self.wfile.write(json.dumps(
-                    'no se encontraron coincidencias').encode())
+                self.enviar_respuesta_vacia()
 
         except Exception as e:
-            self.send_error(500, str(e),)
+            self.enviar_error(500, str(e))
         finally:
-            if cursor:
-                cursor.close()
             if conexion:
                 conexion.close()
 
+    def establecer_conexion_base_datos(self):
+        try:
+            conexion = conectar_base_datos()
+            if not conexion:
+                raise Exception("Error al conectar a la base de datos.")
+            return conexion
+        except Exception:
+            self.handle_database_connection_error()
+            return None
 
-def handle_database_connection_error(self):
-    self.send_response(500)
-    self.send_header('Content-type', 'application/json')
-    self.end_headers()
-    self.wfile.write(json.dumps(
-        {"error": "Error al conectar a la base de datos"}).encode())
+    def obtener_parametros_url(self):
+        parsed_path = urllib.parse.urlparse(self.path)
+        return urllib.parse.parse_qs(parsed_path.query)
 
+    def validar_path(self):
+        endpoint = "/get_and_search/"
+        if self.path.startswith(endpoint):
+            return True
+        else:
+            self.send_error(400, str('Error al ingresar el endpoint'))
+            return False
 
-def validate_path(self, parsed_path):
-    endpoint = "/get_and_search/"
-    if parsed_path.path == endpoint:
-        return True
-    else:
-        self.send_error(400, str('Error al ingresar el endpoint'))
-        return False
+    def construir_consulta(self, query_params):
+        consulta = """
+            SELECT p.address, p.city, s.name AS current_status, p.price, p.description
+            FROM property p
+            JOIN (
+                SELECT sh.property_id, sh.status_id, sh.update_date
+                FROM status_history sh
+                JOIN (
+                    SELECT property_id, MAX(update_date) AS max_update_date
+                    FROM status_history
+                    GROUP BY property_id
+                ) max_sh ON sh.property_id = max_sh.property_id AND sh.update_date = max_sh.max_update_date
+            ) latest_sh ON p.id = latest_sh.property_id
+            JOIN status s ON latest_sh.status_id = s.id
+            """
+        estados_permitidos = ("pre_venta", "en_venta", "vendido")
+
+        condiciones = []
+
+        if 'year' in query_params:
+            condiciones.append("p.year = {}".format(query_params['year'][0]))
+
+        if 'city' in query_params:
+            condiciones.append("p.city = '{}'".format(query_params['city'][0]))
+
+        if 'state' in query_params:
+            estado = query_params['state'][0]
+            if estado in estados_permitidos:
+                condiciones.append("s.name = '{}'".format(estado))
+            else:
+                self.enviar_error(
+                    400, "Estado no permitido para la consulta, pruebe con los estados disponibles")
+                return None
+
+        if condiciones:
+            consulta += " WHERE " + " AND ".join(condiciones)
+
+        return consulta
+
+    def ejecutar_consulta(self, conexion, consulta):
+        cursor = conexion.cursor()
+        cursor.execute(consulta)
+        return cursor.fetchall()
+
+    def enviar_respuesta(self, resultado):
+        resultado_json = json.dumps(resultado).encode()
+        self.wfile.write(resultado_json)
+
+    def enviar_respuesta_vacia(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(
+            'No se encontraron coincidencias').encode())
+
+    def enviar_error(self, code, message):
+        self.send_error(code, message)
+
+    def handle_database_connection_error(self):
+        self.send_response(500)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+        self.wfile.write(json.dumps(
+            {"error": "Error al conectar a la base de datos"}).encode())
