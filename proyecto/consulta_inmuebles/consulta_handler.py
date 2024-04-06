@@ -2,7 +2,7 @@ import json
 import urllib.parse
 from http.server import BaseHTTPRequestHandler
 
-from database import conectar_base_datos
+from database import connect_to_database
 from validate_type import validate_query_params
 
 
@@ -13,60 +13,61 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header("Content-type", "application/json")
             self.end_headers()
 
-            conexion = self.establecer_conexion_base_datos()
-            if not conexion:
+            connection = self.establish_database_connection()
+            if not connection:
                 self.handle_database_connection_error()
                 return
 
-            query_params = self.obtener_parametros_url()
+            query_params = self.get_url_parameters()
 
-            if not self.validar_path():
+            if not self.validate_path():
                 return
-            
+
             validated = validate_query_params(query_params)
 
             if isinstance(validated, list):
                 return self.wfile.write(json.dumps(
                     {"error": validated}).encode())
 
-            consulta = self.construir_consulta(query_params)
-            resultado = self.ejecutar_consulta(conexion, consulta)
+            query = self.build_query(query_params)
+            result = self.execute_query(connection, query)
 
-            if resultado:
-                self.enviar_respuesta(resultado)
+            if result:
+                self.response(result)
             else:
-                self.enviar_respuesta_vacia()
+                self.send_empty_response()
 
         except Exception as e:
-            self.send_error(500, str(e))
+            self.wfile.write(json.dumps(
+                    {"error": e}).encode())
         finally:
-            if conexion:
-                conexion.close()
+            if connection:
+                connection.close()
 
-    def establecer_conexion_base_datos(self):
+    def establish_database_connection(self):
         try:
-            conexion = conectar_base_datos()
-            if not conexion:
-                raise Exception("Error al conectar a la base de datos.")
-            return conexion
+            connection = connect_to_database()
+            if not connection:
+                raise Exception("Error connecting to the database.")
+            return connection
         except Exception:
             self.handle_database_connection_error()
             return None
 
-    def obtener_parametros_url(self):
+    def get_url_parameters(self):
         parsed_path = urllib.parse.urlparse(self.path)
         return urllib.parse.parse_qs(parsed_path.query)
 
-    def validar_path(self):
+    def validate_path(self):
         endpoint = "/get_and_search/"
         if self.path.startswith(endpoint):
             return True
         else:
-            self.send_error(400, str('Error al ingresar el endpoint'))
+            self.send_error(400, str('Error entering the endpoint'))
             return False
 
-    def construir_consulta(self, query_params):
-        consulta = """
+    def build_query(self, query_params):
+        query = """
             SELECT p.address, p.city, s.name AS current_status, p.price, p.description
             FROM property p
             JOIN (
@@ -80,49 +81,40 @@ class RequestHandler(BaseHTTPRequestHandler):
             ) latest_sh ON p.id = latest_sh.property_id
             JOIN status s ON latest_sh.status_id = s.id
             """
-        estados_permitidos = ("pre_venta", "en_venta", "vendido")
 
-        condiciones = []
+        conditions = []
 
         if 'year' in query_params:
-            condiciones.append("p.year = {}".format(query_params['year'][0]))
+            conditions.append("p.year = {}".format(query_params['year'][0]))
 
         if 'city' in query_params:
-            condiciones.append("p.city = '{}'".format(query_params['city'][0]))
+            conditions.append("p.city = '{}'".format(query_params['city'][0]))
 
         if 'state' in query_params:
-            estado = query_params['state'][0]
-            if estado in estados_permitidos:
-                condiciones.append("s.name = '{}'".format(estado))
-            else:
-                self.send_error(
-                    400, "Estado no permitido para la consulta, pruebe con los estados disponibles")
-                return None
+            conditions.append("s.name = '{}'".format(
+                query_params['state'][0]))
 
-        if condiciones:
-            consulta += " WHERE " + " AND ".join(condiciones)
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
 
-        return consulta
+        return query
 
-    def ejecutar_consulta(self, conexion, consulta):
-        cursor = conexion.cursor()
-        cursor.execute(consulta)
+    def execute_query(self, connection, query):
+        cursor = connection.cursor()
+        cursor.execute(query)
         return cursor.fetchall()
 
-    def enviar_respuesta(self, resultado):
-        resultado_json = json.dumps(resultado).encode()
-        self.wfile.write(resultado_json)
+    def response(self, result):
+        result_json = json.dumps(result).encode()
+        self.wfile.write(result_json)
 
-    def enviar_respuesta_vacia(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
+    def send_empty_response(self):
         self.wfile.write(json.dumps(
-            'No se encontraron coincidencias').encode())
+            {"message": "No matches found"}).encode())
 
     def handle_database_connection_error(self):
         self.send_response(500)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
         self.wfile.write(json.dumps(
-            {"error": "Error al conectar a la base de datos"}).encode())
+            {"error": "Error connecting to the database"}).encode())

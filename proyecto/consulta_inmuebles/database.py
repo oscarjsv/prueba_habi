@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def conectar_base_datos():
+def connect_to_database():
     try:
         conexion = mysql.connector.connect(
             host=os.getenv("DB_HOST"),
@@ -15,8 +15,7 @@ def conectar_base_datos():
             password=os.getenv("DB_PASS"),
             database=os.getenv("DB_SCHEMA")
         )
-        print("Conexión a la base de datos exitosa")
         return conexion
     except mysql.connector.Error as error:
-        print("Error al conectar a la base de datos:", error)
+        print("Error connecting to the database:", error)
         return None

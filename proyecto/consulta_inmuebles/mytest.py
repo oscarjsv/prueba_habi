@@ -1,12 +1,10 @@
 import json
 from http.server import HTTPServer
-import socketserver
 import threading
 import urllib.request
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
 
-from consulta_handler import RequestHandler, validate_path
+from consulta_handler import RequestHandler
 
 
 class TestRequestHandler(TestCase):
@@ -26,23 +24,24 @@ class TestRequestHandler(TestCase):
         cls.server.shutdown()
         cls.thread.join()
 
-    # Verifico si devuelve una cadena de texto cuando no se encuentran coinicidencias en la busqueda
+    # Check if it returns a text string when no matches are found in the search
     def test_get_request_not_matches(self):
         response = urllib.request.urlopen(
             f'http://localhost:{self.port}/get_and_search/?year=2020&city=Medellin&state=en_venta')
         self.assertEqual(response.status, 200)
         response_data = json.loads(response.read().decode())
-        self.assertIsInstance(response_data, str)
+        self.assertIsInstance(response_data, dict)
 
-    # Verifico si una parte del string que se devuelve cuando un estado es invalido coincide con la respuesta de mi api
+    # Check if a part of the string returned when a state is invalid matches the response from my API
     def test_get_request_with_invalid_state_parameter(self):
         response = urllib.request.urlopen(
             f'http://localhost:{self.port}/get_and_search/?year=2020&city=Medellin&state=invalido')
         self.assertEqual(response.status, 200)
         response_data = json.loads(response.read().decode())
-        self.assertIn('Estado no permitido', response_data['message'])
+        self.assertIn('state - Value error, Invalid status',
+                      response_data['error'])
 
-    # verifico si el tipo que se devuelve de una peticion es una lista cuando no se pasa ningun parametro
+    # Check if the type returned from a request is a list when no parameters are passed
     def test_get_request_without_parameters(self):
         response = urllib.request.urlopen(
             f'http://localhost:{self.port}/get_and_search/')
@@ -50,7 +49,7 @@ class TestRequestHandler(TestCase):
         response_data = json.loads(response.read().decode())
         self.assertIsInstance(response_data, list)
 
-    # verifico si el tipo que se devuelve de una peticion es una lista cuando no se pasan varios parametros
+    # Check if the type returned from a request is a list when multiple parameters are not passed
     def test_get_request_with_one_response(self):
         response = urllib.request.urlopen(
             f'http://localhost:{self.port}/get_and_search/?city=bucaramanga&state=en_venta&year=2021')
@@ -58,18 +57,11 @@ class TestRequestHandler(TestCase):
         response_data = json.loads(response.read().decode())
         self.assertIsInstance(response_data, list)
 
-    # Verifico que el endpoint pasado sea igual al que se tiene como predeterminado
-    def test_parsed_path_equal_to_endpoint(self):
-        parsed_path = urllib.parse.urlparse("/get_and_search/")
-        result = validate_path(self, parsed_path)
-        self.assertTrue(result)
-
-    # returns False and sends a 400 error if parsed_path is None
+    # Returns False and sends a 400 error if parsed_path is None
     def test_parsed_path_none(self):
-        parsed_path = None
         with self.assertRaises(Exception) as context:
             try:
-                validate_path(self, parsed_path)
+                RequestHandler.validate_path(self)
             except AttributeError as e:
                 self.assertEqual(
                     str(e), "'AttributeError' object has no attribute 'code'")
