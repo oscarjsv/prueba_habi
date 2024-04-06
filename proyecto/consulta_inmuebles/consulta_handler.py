@@ -1,9 +1,9 @@
 import json
-from http.server import BaseHTTPRequestHandler
-import os
 import urllib.parse
+from http.server import BaseHTTPRequestHandler
 
 from database import conectar_base_datos
+from validate_type import validate_query_params
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -22,6 +22,12 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             if not self.validar_path():
                 return
+            
+            validated = validate_query_params(query_params)
+
+            if isinstance(validated, list):
+                return self.wfile.write(json.dumps(
+                    {"error": validated}).encode())
 
             consulta = self.construir_consulta(query_params)
             resultado = self.ejecutar_consulta(conexion, consulta)
@@ -32,7 +38,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.enviar_respuesta_vacia()
 
         except Exception as e:
-            self.enviar_error(500, str(e))
+            self.send_error(500, str(e))
         finally:
             if conexion:
                 conexion.close()
@@ -89,7 +95,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             if estado in estados_permitidos:
                 condiciones.append("s.name = '{}'".format(estado))
             else:
-                self.enviar_error(
+                self.send_error(
                     400, "Estado no permitido para la consulta, pruebe con los estados disponibles")
                 return None
 
@@ -113,9 +119,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(
             'No se encontraron coincidencias').encode())
-
-    def enviar_error(self, code, message):
-        self.send_error(code, message)
 
     def handle_database_connection_error(self):
         self.send_response(500)
