@@ -21,6 +21,8 @@ Este proyecto consiste en desarrollar un servidor HTTP que permita realizar cons
 
 5. **Manejo de Errores**: Implementaremos el manejo de errores para manejar situaciones como la falta de conexión a la base de datos, solicitudes incorrectas o errores internos del servidor. Utilizaremos códigos de estado HTTP apropiados y mensajes de error descriptivos para informar al cliente sobre el estado de la solicitud.
 
+6. **Validacion de los Datos**: Implementamos el manejo de datos al momento en el que el cliente ingresa los datos atraves de los query paramters. se uso la libreria pydantic que nos ayuda con que los datos sean correctos y estén bien formados.
+
 ## Filtros de la API
 
 Aquí se describen los filtros que se pueden utilizar al hacer consultas a la API. Se espera que estos filtros sean enviados desde el front-end para filtrar los resultados de la consulta.
