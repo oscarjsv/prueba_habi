@@ -62,7 +62,7 @@ No se si dokerizar la aplicacion o no estoy pensandolo
 
 ## Diagrama de Entidad-Relación
 
-![Diagrama ER](https://docs.google.com/document/d/1y2e7SfVTJacnlLs1Uk_G3u3woo3ZmGK3JaO7b11y2pw/edit?usp=drive_link)
+![Diagrama ER](https://raw.githubusercontent.com/oscarjsv/prueba_habi/main/proyecto/assets/UML%20diagrams.png)
 
 ## Código SQL
 
