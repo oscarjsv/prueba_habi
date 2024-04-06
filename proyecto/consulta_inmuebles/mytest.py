@@ -1,9 +1,10 @@
 import json
-from http.server import HTTPServer
 import threading
 import urllib.request
 from unittest import TestCase
+from http.server import HTTPServer
 
+from validate_type import QueryParams
 from consulta_handler import RequestHandler
 
 
@@ -69,3 +70,19 @@ class TestRequestHandler(TestCase):
                     context.exception.__class__.__name__, 'AttributeError')
             else:
                 self.fail("Expected an AttributeError to be raised")
+
+    # Creating an instance of QueryParams with no arguments should result in an object with all attributes set to None.
+    def test_instance_with_no_arguments(self):
+        query_params = QueryParams()
+        self.assertIsNone(query_params.year)
+        self.assertIsNone(query_params.city)
+        self.assertIsNone(query_params.state)
+    
+    def test_non_integer_year_attribute(self):
+        with self.assertRaises(TypeError):
+            query_params = QueryParams(year='string')
+    
+    # Creating an instance of QueryParams with a non-integer value for the 'year' attribute should not result in a ValidationError being raised.
+    def test_non_integer_year_attribute(self):
+        query_params = QueryParams(year='2021')
+        self.assertEqual(query_params.year, 2021)

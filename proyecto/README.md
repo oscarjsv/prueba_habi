@@ -58,6 +58,43 @@ No se si dokerizar la aplicacion o no estoy pensandolo
 4. Realiza solicitudes GET al servidor especificando los parámetros deseados en la URL.
 
 
-## Licencia
+# Servicio de “Me gusta”
 
-Este proyecto está bajo la Licencia MIT. Consulta el archivo LICENSE para más detalles.
+## Diagrama de Entidad-Relación
+
+![Diagrama ER](https://docs.google.com/document/d/1y2e7SfVTJacnlLs1Uk_G3u3woo3ZmGK3JaO7b11y2pw/edit?usp=drive_link)
+
+## Código SQL
+
+```sql
+CREATE TABLE Usuario (
+    id INT PRIMARY KEY,
+    nombre VARCHAR(255),
+    email VARCHAR(255),
+    -- otros atributos necesarios
+);
+
+CREATE TABLE Inmueble (
+    id INT PRIMARY KEY,
+    direccion VARCHAR(255),
+    ciudad VARCHAR(255),
+    estado VARCHAR(255),
+    precio_venta DECIMAL,
+    descripcion TEXT,
+    -- otros atributos necesarios
+);
+
+CREATE TABLE MeGusta (
+    id INT PRIMARY KEY,
+    usuario_id INT,
+    inmueble_id INT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES Usuario(id),
+    FOREIGN KEY (inmueble_id) REFERENCES Inmueble(id)
+);
+```
+## Descripcion
+
+Creé el diagrama de Entidad-Relación y el código SQL de esta manera tras considerar el tipo de relación entre un usuario y un inmueble. En este diseño, un usuario puede dar "me gusta" a muchos inmuebles, y a su vez, un inmueble puede recibir "me gusta" de muchos usuarios. Además, la base de datos está diseñada para mantener un registro histórico de todos los "me gusta" que cada usuario ha dado a diferentes inmuebles. Esto implica la necesidad de rastrear y almacenar quién dio el "me gusta" (el usuario registrado), a qué inmueble se le dio el "me gusta" y cuándo se dio el "me gusta".
+
+En este modelo, cada entidad tiene una llave primaria. Las llaves foráneas presentes en la entidad "MeGusta" son el ID del usuario y el ID del inmueble, lo que establece la relación entre un usuario y un inmueble.
