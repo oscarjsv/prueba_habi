@@ -8,6 +8,7 @@ Este proyecto consiste en desarrollar un servidor HTTP que permita realizar cons
 - BaseHTTPRequestHandler: Utilizaremos la clase BaseHTTPRequestHandler de la biblioteca http.server para manejar las solicitudes HTTP entrantes.
 - Mysql: Utilizaremos SQLite como base de datos para almacenar la información sobre las propiedades inmobiliarias.
 - JSON: Utilizaremos el formato JSON para la comunicación de datos entre el servidor y el cliente.
+- Pydancti:  es una librería de validación de datos y serialización en Python que te permite definir y validar modelos de datos de forma sencilla y declarativa.
 
 ## Enfoque de Desarrollo
 

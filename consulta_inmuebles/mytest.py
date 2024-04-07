@@ -77,11 +77,11 @@ class TestRequestHandler(TestCase):
         self.assertIsNone(query_params.year)
         self.assertIsNone(query_params.city)
         self.assertIsNone(query_params.state)
-    
+
     def test_non_integer_year_attribute(self):
         with self.assertRaises(TypeError):
             query_params = QueryParams(year='string')
-    
+
     # Creating an instance of QueryParams with a non-integer value for the 'year' attribute should not result in a ValidationError being raised.
     def test_non_integer_year_attribute(self):
         query_params = QueryParams(year='2021')
