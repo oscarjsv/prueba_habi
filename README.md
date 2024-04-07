@@ -47,17 +47,44 @@ Aquí se describen los filtros que se pueden utilizar al hacer consultas a la AP
   }
 }
 ```
+## Ejemplo de filtros
+
+- http://localhost:8000/get_and_search/?city=Medellin&year=2002
+- http://localhost:8000/get_and_search/?city=bucaramanga&state=en_venta&year=2021
+
 ## Dudas
 
 No se si dokerizar la aplicacion o no estoy pensandolo
+al final no hice el docker como la aplicacion es sencilla me parecio mejor dejar los requeriments y que se use en un venv
 
 ## Ejecución del Proyecto
 
 1. Clona este repositorio en tu máquina local.
-2. Instala las dependencias necesarias ejecutando `pip install -r requirements.txt`.
-3. Ejecuta el servidor utilizando el comando `python main.py`.
-4. Realiza solicitudes GET al servidor especificando los parámetros deseados en la URL.
-5. El endpoint con el que se puede acceder a la api es http://localhost:8000/get_and_search/
+2. Instala `venv` si aún no lo tienes instalado. Puedes encontrar la documentación oficial de `venv` [aquí](https://docs.python.org/3/library/venv.html).
+3. Crea un nuevo entorno virtual en el directorio de tu proyecto. Puedes hacerlo con el siguiente comando:
+
+    ```bash
+    python3 -m venv myenv
+    ```
+
+    Esto creará un nuevo directorio llamado `myenv` que contendrá el entorno virtual.
+4. Activa el entorno virtual. Dependiendo de tu sistema operativo, el comando para activar el entorno virtual puede variar:
+
+    - En Windows:
+
+        ```bash
+        myenv\Scripts\activate
+        ```
+
+    - En macOS y Linux:
+
+        ```bash
+        source myenv/bin/activate
+        ```
+5. Instala las dependencias necesarias ejecutando `pip install -r requirements.txt`.
+6. Ejecuta el servidor utilizando el comando `python main.py`.
+7. Realiza solicitudes GET al servidor especificando los parámetros deseados en la URL.
+8. El endpoint con el que se puede acceder a la api es http://localhost:8000/get_and_search/
 
 ## Ejecución de los Tests
 
