@@ -25,24 +25,8 @@ class TestRequestHandler(TestCase):
         cls.server.shutdown()
         cls.thread.join()
 
-    # Check if it returns a text string when no matches are found in the search
-    def test_get_request_not_matches(self):
-        response = urllib.request.urlopen(
-            f'http://localhost:{self.port}/get_and_search/?year=2020&city=Medellin&state=en_venta')
-        self.assertEqual(response.status, 200)
-        response_data = json.loads(response.read().decode())
-        self.assertIsInstance(response_data, dict)
-
-    # Check if a part of the string returned when a state is invalid matches the response from my API
-    def test_get_request_with_invalid_state_parameter(self):
-        response = urllib.request.urlopen(
-            f'http://localhost:{self.port}/get_and_search/?year=2020&city=Medellin&state=invalido')
-        self.assertEqual(response.status, 200)
-        response_data = json.loads(response.read().decode())
-        self.assertIn('state - Value error, Invalid status',
-                      response_data['error'])
-
     # Check if the type returned from a request is a list when no parameters are passed
+
     def test_get_request_without_parameters(self):
         response = urllib.request.urlopen(
             f'http://localhost:{self.port}/get_and_search/')

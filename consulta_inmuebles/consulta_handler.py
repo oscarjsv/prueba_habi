@@ -24,8 +24,15 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             validated = validate_query_params(query_params)
 
+            text_plain = "text/plain"
+
             if isinstance(validated, list):
-                self.send_error(404, str(validated[0]))
+                error_message = f"Validation error: {validated[0]}"
+                self.send_response(404)  # Cambiado a un código de estado 400
+                self.send_header("Content-type", text_plain)
+                self.end_headers()
+                self.wfile.write(json.dumps(
+                    {"messaje": error_message}).encode())
                 return
 
             query = self.build_query(query_params)
@@ -71,7 +78,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         if self.path.startswith(endpoint):
             return True
         else:
-            self.send_error(400, str('Error entering the endpoint'))
+            message = "Error entering the endpoint"
+            self.send_response(404)  # Cambiado a un código de estado 400
+            self.send_header("Content-type", text_plain)
+            self.end_headers()
+            self.wfile.write(json.dumps(
+                {"messaje": message}).encode())
             return False
 
     def build_query(self, query_params):
@@ -132,8 +144,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         """
         Sends an empty response when no matches are found.
         """
+        message = "No matches found"
+        self.send_response(404)  # Cambiado a un código de estado 400
+        self.send_header("Content-type", text_plain)
+        self.end_headers()
         self.wfile.write(json.dumps(
-            {"message": "No matches found"}).encode())
+            {"messaje": message}).encode())
 
     def handle_database_connection_error(self):
         """
