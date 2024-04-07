@@ -54,8 +54,8 @@ Aquí se describen los filtros que se pueden utilizar al hacer consultas a la AP
 
 ## Dudas
 
-No se si dokerizar la aplicacion o no estoy pensandolo
-al final no hice el docker como la aplicacion es sencilla me parecio mejor dejar los requeriments y que se use en un venv
+- No se si dokerizar la aplicacion o no
+- al final no hice el docker como la aplicacion es sencilla me parecio mejor dejar los requirements y que se use en un venv
 
 ## Ejecución del Proyecto
 
