@@ -11,6 +11,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         """
         Handles GET requests.
         """
+
         try:
             connection = self.establish_database_connection()
             if not connection:
@@ -24,15 +25,9 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             validated = validate_query_params(query_params)
 
-            text_plain = "text/plain"
-
             if isinstance(validated, list):
                 error_message = f"Validation error: {validated[0]}"
-                self.send_response(404)  # Cambiado a un código de estado 400
-                self.send_header("Content-type", text_plain)
-                self.end_headers()
-                self.wfile.write(json.dumps(
-                    {"messaje": error_message}).encode())
+                self.api_response(404, error_message)
                 return
 
             query = self.build_query(query_params)
@@ -41,7 +36,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             if result:
                 self.response(result)
             else:
-                self.send_empty_response()
+                self.api_response(200, "No matches found")
 
         except Exception as e:
             self.wfile.write(json.dumps(
@@ -78,12 +73,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         if self.path.startswith(endpoint):
             return True
         else:
-            message = "Error entering the endpoint"
-            self.send_response(404)  # Cambiado a un código de estado 400
-            self.send_header("Content-type", text_plain)
-            self.end_headers()
-            self.wfile.write(json.dumps(
-                {"messaje": message}).encode())
+            self.api_response(404, "Error entering the endpoint")
             return False
 
     def build_query(self, query_params):
@@ -140,17 +130,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         result_json = json.dumps(result).encode()
         self.wfile.write(result_json)
 
-    def send_empty_response(self):
-        """
-        Sends an empty response when no matches are found.
-        """
-        message = "No matches found"
-        self.send_response(404)  # Cambiado a un código de estado 400
-        self.send_header("Content-type", text_plain)
-        self.end_headers()
-        self.wfile.write(json.dumps(
-            {"messaje": message}).encode())
-
     def handle_database_connection_error(self):
         """
         Handles the error when there is an issue with the database connection.
@@ -160,3 +139,13 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(
             {"error": "Error connecting to the database"}).encode())
+
+    def api_response(self, code, message):
+        """
+        Send an response.
+        """
+        self.send_response(code)  # Cambiado a un código de estado 400
+        self.send_header("Content-type",  "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(
+            {"messaje": message}).encode())
