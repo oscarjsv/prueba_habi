@@ -55,9 +55,9 @@ No se si dokerizar la aplicacion o no estoy pensandolo
 
 1. Clona este repositorio en tu máquina local.
 2. Instala las dependencias necesarias ejecutando `pip install -r requirements.txt`.
-3. Ejecuta el servidor utilizando el comando `python server.py`.
+3. Ejecuta el servidor utilizando el comando `python main.py`.
 4. Realiza solicitudes GET al servidor especificando los parámetros deseados en la URL.
-
+5. El endpoint con el que se puede acceder a la api es http://localhost:8000/get_and_search/
 
 # Servicio de “Me gusta”
 
