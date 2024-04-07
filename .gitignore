@@ -5,6 +5,7 @@ __pycache__/
 # Entorno virtual (por ejemplo, creado con virtualenv o pipenv)
 venv/
 env/
+*.env
 
 # Dependencias instaladas
 *.egg-info/

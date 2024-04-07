@@ -91,13 +91,13 @@ al final no hice el docker como la aplicacion es sencilla me parecio mejor dejar
 1. **Navega al Directorio del Proyecto Donde se encuentra el archivo de los tests**: Cambia al directorio del proyecto clonado.
 
     ```bash
-    cd prueba_habi/consulta_inmuebles
+    cd prueba_habi
     ```
 
 2. **Ejecuta los Tests**: Utiliza el módulo `unittest` para ejecutar los tests. Reemplaza `mytest.py` con el nombre del archivo que contiene tus tests.
 
     ```bash
-    python -m unittest mytest.py
+    python -m unittest discover -s unittests
     ```
 
     Esto ejecutará todos los tests definidos en el archivo `mytest.py` y mostrará el resultado en la consola.
