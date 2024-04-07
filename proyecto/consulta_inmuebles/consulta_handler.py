@@ -8,6 +8,9 @@ from validate_type import validate_query_params
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        """
+        Handles GET requests.
+        """
         try:
             self.send_response(200)
             self.send_header("Content-type", "application/json")
@@ -39,12 +42,15 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         except Exception as e:
             self.wfile.write(json.dumps(
-                    {"error": e}).encode())
+                {"error": str(e)}).encode())
         finally:
             if connection:
                 connection.close()
 
     def establish_database_connection(self):
+        """
+        Establishes connection to the database.
+        """
         try:
             connection = connect_to_database()
             if not connection:
@@ -55,10 +61,16 @@ class RequestHandler(BaseHTTPRequestHandler):
             return None
 
     def get_url_parameters(self):
+        """
+        Parses and retrieves URL parameters.
+        """
         parsed_path = urllib.parse.urlparse(self.path)
         return urllib.parse.parse_qs(parsed_path.query)
 
     def validate_path(self):
+        """
+        Validates the path of the request.
+        """
         endpoint = "/get_and_search/"
         if self.path.startswith(endpoint):
             return True
@@ -67,6 +79,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             return False
 
     def build_query(self, query_params):
+        """
+        Builds the SQL query based on the query parameters.
+        """
         query = """
             SELECT p.address, p.city, s.name AS current_status, p.price, p.description
             FROM property p
@@ -100,19 +115,31 @@ class RequestHandler(BaseHTTPRequestHandler):
         return query
 
     def execute_query(self, connection, query):
+        """
+        Executes the SQL query.
+        """
         cursor = connection.cursor()
         cursor.execute(query)
         return cursor.fetchall()
 
     def response(self, result):
+        """
+        Sends the response with the result.
+        """
         result_json = json.dumps(result).encode()
         self.wfile.write(result_json)
 
     def send_empty_response(self):
+        """
+        Sends an empty response when no matches are found.
+        """
         self.wfile.write(json.dumps(
             {"message": "No matches found"}).encode())
 
     def handle_database_connection_error(self):
+        """
+        Handles the error when there is an issue with the database connection.
+        """
         self.send_response(500)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
