@@ -59,11 +59,27 @@ No se si dokerizar la aplicacion o no estoy pensandolo
 4. Realiza solicitudes GET al servidor especificando los parámetros deseados en la URL.
 5. El endpoint con el que se puede acceder a la api es http://localhost:8000/get_and_search/
 
+## Ejecución de los Tests
+
+1. **Navega al Directorio del Proyecto Donde se encuentra el archivo de los tests**: Cambia al directorio del proyecto clonado.
+
+    ```bash
+    cd prueba_habi/consulta_inmuebles
+    ```
+
+2. **Ejecuta los Tests**: Utiliza el módulo `unittest` para ejecutar los tests. Reemplaza `mytest.py` con el nombre del archivo que contiene tus tests.
+
+    ```bash
+    python -m unittest mytest.py
+    ```
+
+    Esto ejecutará todos los tests definidos en el archivo `mytest.py` y mostrará el resultado en la consola.
+
 # Servicio de “Me gusta”
 
 ## Diagrama de Entidad-Relación
 
-![Diagrama ER](https://raw.githubusercontent.com/oscarjsv/prueba_habi/main/proyecto/assets/UML%20diagrams.png)
+![Diagrama ER](https://raw.githubusercontent.com/oscarjsv/prueba_habi/main/assets/UML%20diagrams.png)
 
 ## Código SQL
 
