@@ -33,7 +33,7 @@ Aquí se describen los filtros que se pueden utilizar al hacer consultas a la AP
   "filtros": {
     "year": {
       "tipo": "rango",
-      "descripcion": "Filtrar por año de construcción (rango de años)"
+      "descripcion": "Filtrar por año de construcción"
     },
     "city": {
       "tipo": "texto",
