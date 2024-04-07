@@ -31,15 +31,15 @@ Aquí se describen los filtros que se pueden utilizar al hacer consultas a la AP
 ```json
 {
   "filtros": {
-    "año_construccion": {
+    "year": {
       "tipo": "rango",
       "descripcion": "Filtrar por año de construcción (rango de años)"
     },
-    "ciudad": {
+    "city": {
       "tipo": "texto",
       "descripcion": "Filtrar por ciudad"
     },
-    "estado_propiedad": {
+    "state": {
       "tipo": "opciones",
       "descripcion": "Filtrar por estado de la propiedad",
       "opciones": ["pre_venta", "en_venta", "vendido"]
