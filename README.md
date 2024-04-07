@@ -65,6 +65,7 @@ de esta manera
 - export DB_USER=
 - export DB_PASS=
 - export DB_SCHEMA=
+
 1. Clona este repositorio en tu máquina local.
 2. Instala `venv` si aún no lo tienes instalado. Puedes encontrar la documentación oficial de `venv` [aquí](https://docs.python.org/3/library/venv.html).
 3. Crea un nuevo entorno virtual en el directorio de tu proyecto. Puedes hacerlo con el siguiente comando:
