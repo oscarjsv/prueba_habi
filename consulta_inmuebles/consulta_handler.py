@@ -12,10 +12,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         Handles GET requests.
         """
         try:
-            self.send_response(200)
-            self.send_header("Content-type", "application/json")
-            self.end_headers()
-
             connection = self.establish_database_connection()
             if not connection:
                 self.handle_database_connection_error()
@@ -29,8 +25,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             validated = validate_query_params(query_params)
 
             if isinstance(validated, list):
-                return self.wfile.write(json.dumps(
-                    {"error": validated}).encode())
+                self.send_error(404, str(validated[0]))
+                return
 
             query = self.build_query(query_params)
             result = self.execute_query(connection, query)
@@ -126,6 +122,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         """
         Sends the response with the result.
         """
+        self.send_response(200)
+        self.send_header("Content-type", "application/json")
+        self.end_headers()
         result_json = json.dumps(result).encode()
         self.wfile.write(result_json)
 
