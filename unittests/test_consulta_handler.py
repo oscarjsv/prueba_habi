@@ -4,8 +4,8 @@ import urllib.request
 from unittest import TestCase
 from http.server import HTTPServer
 
-from validate_type import QueryParams
-from consulta_handler import RequestHandler
+from consulta_inmuebles.validate_type import QueryParams
+from consulta_inmuebles.consulta_handler import RequestHandler
 
 
 class TestRequestHandler(TestCase):
