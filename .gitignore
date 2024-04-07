@@ -1,0 +1,24 @@
+# Archivos de caché y directorios
+__pycache__/
+*.pyc
+
+# Entorno virtual (por ejemplo, creado con virtualenv o pipenv)
+venv/
+env/
+
+# Dependencias instaladas
+*.egg-info/
+dist/
+build/
+
+# Archivos de configuración locales
+.env
+
+# Archivos de registro y salida
+*.log
+*.txt
+
+# Archivos generados por IDEs o editores de texto
+.idea/
+.vscode/
+*.swp
