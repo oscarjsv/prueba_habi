@@ -1,4 +1,4 @@
-from consulta_handler import RequestHandler
+from consulta_inmuebles.consulta_handler import RequestHandler
 from http.server import HTTPServer
 
 if __name__ == "__main__":

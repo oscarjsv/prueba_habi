@@ -2,8 +2,8 @@ import json
 import urllib.parse
 from http.server import BaseHTTPRequestHandler
 
-from database import connect_to_database
-from validate_type import validate_query_params
+from consulta_inmuebles.database import connect_to_database
+from consulta_inmuebles.validate_type import validate_query_params
 
 
 class RequestHandler(BaseHTTPRequestHandler):
