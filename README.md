@@ -58,7 +58,13 @@ Aquí se describen los filtros que se pueden utilizar al hacer consultas a la AP
 - al final no hice el docker como la aplicacion es sencilla me parecio mejor dejar los requirements y que se use en un venv
 
 ## Ejecución del Proyecto
-
+0. crear un archivo .env en la raiz del poryecto y colocar las variables de la base de datos que me fueron pasadas en el correo en el que se me envio la prueba
+de esta manera 
+- export DB_HOST=
+- export DB_PORT=
+- export DB_USER=
+- export DB_PASS=
+- export DB_SCHEMA=
 1. Clona este repositorio en tu máquina local.
 2. Instala `venv` si aún no lo tienes instalado. Puedes encontrar la documentación oficial de `venv` [aquí](https://docs.python.org/3/library/venv.html).
 3. Crea un nuevo entorno virtual en el directorio de tu proyecto. Puedes hacerlo con el siguiente comando:
